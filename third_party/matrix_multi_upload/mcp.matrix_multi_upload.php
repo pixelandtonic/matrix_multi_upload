@@ -44,8 +44,8 @@ class Matrix_multi_upload_mcp {
 		header("Pragma: no-cache");
 
 		// Settings
-		$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
-		$cleanupTargetDir = false; // Remove old files
+		//$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
+		$targetDir = "/Users/brandon/Sites/ee2sandbox.dev/images/uploads/";
 		$maxFileAge = 60 * 60; // Temp file age in seconds
 
 		// 5 minutes execution time

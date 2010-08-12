@@ -1,58 +1,75 @@
-var MatrixMultiUpload = {};
+var MatrixMultiUploadURL;
 
 
 (function($) {
 
 
-$(document).ready(function(){
-setTimeout(function(){
+var $tab = $('#accessoryTabs a.matrix_multi_upload');
 
-	var $tab = jQuery('#accessoryTabs a.matrix_multi_upload'), //.parent('li'),
-		$pane = $('#matrix_multi_upload'),
-		targets = [];
+$tab.bind('click.matrix_multi_upload', function(){
+	// wait for the tab to show
+	setTimeout(function(){
 
-	for (var i in Matrix.instances) {
-		var matrix = Matrix.instances[i];
+		// only initialize once
+		$tab.unbind('click.matrix_multi_upload');
 
-		for (var c in matrix.cols) {
-			var col = matrix.cols[c];
+		// find File cols on this page
+		var targetCols = [];
+		for (var i in Matrix.instances) {
+			var matrix = Matrix.instances[i];
 
-			if (col.type == 'file') {
-				targets.push({
-					label:  matrix.label+' - '+col.label,
-					matrix: matrix,
-					col:    col
-				});
+			for (var c in matrix.cols) {
+				var col = matrix.cols[c];
+
+				if (col.type == 'file') {
+					targetCols.push({
+						label:  matrix.label+' - '+col.label,
+						matrix: matrix,
+						col:    col
+					});
+				}
 			}
 		}
-	}
 
-	if (targets.length) {
+		// quit if no File cols
+		if (! targetCols.length) return;
 
-		var $target = $('<select id="matrix_multi_upload_target" />');
+		var $pane = $('#matrix_multi_upload'),
+			$targetDir = $('select[name=matrix_multi_upload_dir]', $pane),
+			$uploader = $('#matrix_multi_upload_uploader', $pane);
 
-		for (var t in targets) {
-			var target = targets[t];
+		// create the Target Col select
+		var $targetCol = $('<select id="matrix_multi_upload_target" />');
+		$('#matrix_multi_upload_target', $pane).replaceWith($targetCol);
 
-			$target.append($('<option value="'+t+'">'+target.label+'</option>'));
+		// add the options
+		for (var t in targetCols) {
+			$targetCol.append($('<option value="'+t+'">'+targetCols[t].label+'</option>'));
 		}
 
-		$('#matrix_multi_upload_target').replaceWith($target);
-	}
+		var getURL = function() {
+			return MatrixMultiUploadURL + '&dir=' + $targetDir.val();
+		};
 
-	$tab.click(function(){
-		setTimeout(function(){
+		// initialize the uploader
+		$uploader.pluploadQueue({
+			runtimes: 'gears,html5,flash,silverlight,browserplus',
+			url:      getURL()
+		});
 
-			// attach the uploader
-			$("#matrix_multi_upload_plupload").pluploadQueue({
-				runtimes: 'gears,html5,flash,silverlight,browserplus',
-				url:      MatrixMultiUpload.uploadUrl
-			});
+		// get the plupload object
+		var uploader = $uploader.pluploadQueue();
 
-		}, 1);
-	});
+		// keep the URL up-to-date
+		$targetDir.change(function() {
+			uploader.settings.url = getURL();
+		});
 
-}, 1);
+		//uploader.bind('UploadProgress', function(up, file) {
+		//	$('#' + file.id + " span").html(file.percent + "%");
+		//});
+
+	}, 1);
 });
 
 

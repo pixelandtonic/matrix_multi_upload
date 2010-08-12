@@ -125,11 +125,16 @@ class Matrix_multi_upload_acc {
 
 					// make the upload URL available to JS
 					$this->_include_theme_css('styles/matrix_multi_upload.css');
-					$this->_insert_js('MatrixMultiUpload.uploadUrl = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
+					$this->_insert_js('MatrixMultiUploadURL = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
 
 
+					$upload_html = '<div id="matrix_multi_upload_uploader" style="width: 450px; height: 330px;">'
+					             .   'You browser doesn’t support multi-file uploading.'
+					             . '</div>';
+
+					// add the sections
 					$this->sections['Settings'] = $settings_html;
-					$this->sections['Upload Files'] = '<div id="matrix_multi_upload_plupload" style="width: 450px; height: 330px;">You browser doesn’t support multi-file uploading.</div>';
+					$this->sections['Upload Files'] = $upload_html;
 				}
 				else
 				{
