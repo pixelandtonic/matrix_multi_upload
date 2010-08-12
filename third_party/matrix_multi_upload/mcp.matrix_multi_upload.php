@@ -21,6 +21,15 @@ class Matrix_multi_upload_mcp {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Error
+	 */
+	private function _error($code)
+	{
+		$this->EE->lang->loadfile('matrix_multi_upload');
+		exit('{"jsonrpc" : "2.0", "error" : {"code": '.$code.', "message": "'.$this->EE->lang->line('error_'.$code).'"}, "id" : "id"}');
+	}
+
+	/**
 	 * Upload
 	 */
 	function upload()
@@ -43,24 +52,37 @@ class Matrix_multi_upload_mcp {
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
 
-		// Settings
-		//$path = ini_get("upload_tmp_dir").DIRECTORY_SEPARATOR."plupload";
-		if (!( ($dir = $this->EE->input->get('dir'))
-			&& ($query = $this->EE->db->query('SELECT server_path, url FROM exp_upload_prefs WHERE id = "'.$dir.'"'))
-			&& $query->num_rows()
-		))
+		$this->EE->load->library('filemanager');
+		$this->EE->load->model('tools_model');
+
+		// Get the upload prefs
+		$upload_id = $this->EE->input->get('dir');
+		$upload_dir_result = $this->EE->tools_model->get_upload_preferences($this->EE->session->userdata('member_group'), $upload_id);
+		$upload_dir_prefs = $upload_dir_result->row();
+
+
+		// validate upload path
+
+		$path = $upload_dir_prefs->server_path;
+
+		if (! $path)
 		{
-			exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to find upload directory."}, "id" : "id"}');
+			$this->_error('104');
 		}
 
-		// get the full path, without a trailing slash
-		$path = $query->row('server_path');
-		if (substr($path, 0, 1) != DIRECTORY_SEPARATOR) $path = BASEPATH.$path;
-		if (substr($path, -1) == DIRECTORY_SEPARATOR) $path = substr($path, 0, -1);
+		if (function_exists('realpath') AND @realpath($path) !== FALSE)
+		{
+			$path = str_replace("\\", "/", realpath($path));
+		}
 
-		// get the URL, *with* a trailing slash
-		$url = $query->row('url');
-		if (substr($url, -1) != DIRECTORY_SEPARATOR) $url .= DIRECTORY_SEPARATOR;
+		if (! @is_dir($path) || ! is_really_writable($path))
+		{
+			$this->_error('100');
+		}
+
+		if (substr($path, -1) != '/') $path .= '/';
+
+
 
 		// Temp file age in seconds (60 x 60)
 		$maxFileAge = 3600;
@@ -77,14 +99,14 @@ class Matrix_multi_upload_mcp {
 		$file_name = preg_replace('/[^\w\._]+/', '', $file_name);
 
 		// Make sure the fileName is unique
-		if (file_exists($path.DIRECTORY_SEPARATOR.$file_name))
+		if (file_exists($path.$file_name))
 		{
 			$ext = strrpos($file_name, '.');
 			$file_name_a = substr($file_name, 0, $ext);
 			$file_name_b = substr($file_name, $ext);
 
 			$count = 1;
-			while (file_exists($path.DIRECTORY_SEPARATOR.$file_name_a.'_'.$count.$file_name_b))
+			while (file_exists($path.$file_name_a.'_'.$count.$file_name_b))
 			{
 				$count++;
 			}
@@ -92,14 +114,14 @@ class Matrix_multi_upload_mcp {
 			$file_name = $file_name_a.'_'.$count.$file_name_b;
 		}
 
-		$file_path = $path.DIRECTORY_SEPARATOR.$file_name;
+		$file_path = $path.$file_name;
 
 		// Remove old temp files
 		if (is_dir($path) && ($dir = opendir($path)))
 		{
 			while (($file = readdir($dir)) !== false)
 			{
-				$tmp_file_path = $path.DIRECTORY_SEPARATOR.$file;
+				$tmp_file_path = $path.$file;
 
 				// Remove temp files if they are older than the max age
 				if (preg_match('/\\.tmp$/', $file) && (filemtime($tmp_file_path) < time() - $maxFileAge))
@@ -112,7 +134,7 @@ class Matrix_multi_upload_mcp {
 		}
 		else
 		{
-			exit('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
+			$this->_error('100');
 		}
 
 		// Look for the content type header
@@ -147,7 +169,7 @@ class Matrix_multi_upload_mcp {
 					}
 					else
 					{
-						exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+						$this->_error('101');
 					}
 
 					fclose($out);
@@ -155,12 +177,12 @@ class Matrix_multi_upload_mcp {
 				}
 				else
 				{
-					exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+					$this->_error('102');
 				}
 			}
 			else
 			{
-				exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+				$this->_error('103');
 			}
 		}
 		else
@@ -182,23 +204,26 @@ class Matrix_multi_upload_mcp {
 				}
 				else
 				{
-					exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					$this->_error('101');
 				}
 
 				fclose($out);
 			}
 			else
 			{
-				exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+				$this->_error('102');
 			}
 		}
 
 
 		// upload sucessful, now create thumb
 
-		$thumb_path = $path.DIRECTORY_SEPARATOR.'_thumbs';
+		$thumb_path = $path.'_thumbs';
 		$thumb_name = 'thumb_'.$file_name;
-		$thumb_url  = $url.'_thumbs/'.$thumb_name;
+
+		$thumb_url = $upload_dir_prefs->url;
+		if (substr($thumb_url, -1) != '/') $thumb_url .= '/';
+		$thumb_url .= '_thumbs/'.$thumb_name;
 
 		if ( ! is_dir($thumb_path))
 		{
