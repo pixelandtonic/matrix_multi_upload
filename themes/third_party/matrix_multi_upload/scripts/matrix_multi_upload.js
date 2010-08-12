@@ -94,7 +94,7 @@ $tab.bind('click.matrix_multi_upload', function(){
 				cell = row.cells[targetCol.index];
 
 			// select the new file
-			cell.selectFile($targetDir.val(), response.result.name);
+			cell.selectFile($targetDir.val(), response.result.name, response.result.thumb);
 		});
 
 	}, 1);

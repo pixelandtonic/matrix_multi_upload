@@ -44,7 +44,7 @@ class Matrix_multi_upload_mcp {
 		header("Pragma: no-cache");
 
 		// Settings
-		//$path = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
+		//$path = ini_get("upload_tmp_dir").DIRECTORY_SEPARATOR."plupload";
 		if (!( ($dir = $this->EE->input->get('dir'))
 			&& ($query = $this->EE->db->query('SELECT server_path, url FROM exp_upload_prefs WHERE id = "'.$dir.'"'))
 			&& $query->num_rows()
@@ -55,12 +55,12 @@ class Matrix_multi_upload_mcp {
 
 		// get the full path, without a trailing slash
 		$path = $query->row('server_path');
-		if (substr($path, 0, 1) != '/') $path = BASEPATH . $path;
-		if (substr($path, -1) == '/') $path = substr($path, 0, -1);
+		if (substr($path, 0, 1) != DIRECTORY_SEPARATOR) $path = BASEPATH.$path;
+		if (substr($path, -1) == DIRECTORY_SEPARATOR) $path = substr($path, 0, -1);
 
 		// get the URL, *with* a trailing slash
 		$url = $query->row('url');
-		if (substr($url, -1) != '/') $url .= '/';
+		if (substr($url, -1) != DIRECTORY_SEPARATOR) $url .= DIRECTORY_SEPARATOR;
 
 		// Temp file age in seconds (60 x 60)
 		$maxFileAge = 3600;
@@ -71,38 +71,40 @@ class Matrix_multi_upload_mcp {
 		// Get parameters
 		$chunk = isset($_REQUEST["chunk"]) ? $_REQUEST["chunk"] : 0;
 		$chunks = isset($_REQUEST["chunks"]) ? $_REQUEST["chunks"] : 0;
-		$fileName = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
+		$file_name = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
 
 		// Clean the fileName for security reasons
-		$fileName = preg_replace('/[^\w\._]+/', '', $fileName);
+		$file_name = preg_replace('/[^\w\._]+/', '', $file_name);
 
 		// Make sure the fileName is unique
-		if (file_exists($path . DIRECTORY_SEPARATOR . $fileName))
+		if (file_exists($path.DIRECTORY_SEPARATOR.$file_name))
 		{
-			$ext = strrpos($fileName, '.');
-			$fileName_a = substr($fileName, 0, $ext);
-			$fileName_b = substr($fileName, $ext);
+			$ext = strrpos($file_name, '.');
+			$file_name_a = substr($file_name, 0, $ext);
+			$file_name_b = substr($file_name, $ext);
 
 			$count = 1;
-			while (file_exists($path . DIRECTORY_SEPARATOR . $fileName_a . '_' . $count . $fileName_b))
+			while (file_exists($path.DIRECTORY_SEPARATOR.$file_name_a.'_'.$count.$file_name_b))
 			{
 				$count++;
 			}
 
-			$fileName = $fileName_a . '_' . $count . $fileName_b;
+			$file_name = $file_name_a.'_'.$count.$file_name_b;
 		}
+
+		$file_path = $path.DIRECTORY_SEPARATOR.$file_name;
 
 		// Remove old temp files
 		if (is_dir($path) && ($dir = opendir($path)))
 		{
 			while (($file = readdir($dir)) !== false)
 			{
-				$filePath = $path . DIRECTORY_SEPARATOR . $file;
+				$tmp_file_path = $path.DIRECTORY_SEPARATOR.$file;
 
 				// Remove temp files if they are older than the max age
-				if (preg_match('/\\.tmp$/', $file) && (filemtime($filePath) < time() - $maxFileAge))
+				if (preg_match('/\\.tmp$/', $file) && (filemtime($tmp_file_path) < time() - $maxFileAge))
 				{
-					@unlink($filePath);
+					@unlink($tmp_file_path);
 				}
 			}
 
@@ -116,20 +118,20 @@ class Matrix_multi_upload_mcp {
 		// Look for the content type header
 		if (isset($_SERVER["HTTP_CONTENT_TYPE"]))
 		{
-			$contentType = $_SERVER["HTTP_CONTENT_TYPE"];
+			$content_type = $_SERVER["HTTP_CONTENT_TYPE"];
 		}
 
 		if (isset($_SERVER["CONTENT_TYPE"]))
 		{
-			$contentType = $_SERVER["CONTENT_TYPE"];
+			$content_type = $_SERVER["CONTENT_TYPE"];
 		}
 
-		if (isset($contentType) && strpos($contentType, "multipart") !== false)
+		if (isset($content_type) && strpos($content_type, "multipart") !== false)
 		{
 			if (isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']))
 			{
 				// Open temp file
-				$out = fopen($path . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
+				$out = fopen($file_path, $chunk == 0 ? "wb" : "ab");
 
 				if ($out)
 				{
@@ -164,7 +166,7 @@ class Matrix_multi_upload_mcp {
 		else
 		{
 			// Open temp file
-			$out = fopen($path . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
+			$out = fopen($file_path, $chunk == 0 ? "wb" : "ab");
 
 			if ($out)
 			{
@@ -191,8 +193,32 @@ class Matrix_multi_upload_mcp {
 			}
 		}
 
+
+		// upload sucessful, now create thumb
+
+		$thumb_path = $path.DIRECTORY_SEPARATOR.'_thumbs';
+		$thumb_name = 'thumb_'.$file_name;
+		$thumb_url  = $url.'_thumbs/'.$thumb_name;
+
+		if ( ! is_dir($thumb_path))
+		{
+			mkdir($thumb_path);
+		}
+
+		$resize['source_image']   = $file_path;
+		$resize['new_image']      = $thumb_path.DIRECTORY_SEPARATOR.$thumb_name;
+		$resize['maintain_ratio'] = TRUE;
+		$resize['image_library']  = $this->EE->config->item('image_resize_protocol');
+		$resize['library_path']   = $this->EE->config->item('image_library_path');
+		$resize['width']          = 73;
+		$resize['height']         = 60;
+
+		$this->EE->load->library('image_lib', $resize);
+		$this->EE->image_lib->resize();
+
+
 		// Return JSON-RPC response
-		exit('{"jsonrpc" : "2.0", "result" : {"name" : "'.$fileName.'"}, "id" : "id"}');
+		exit('{"jsonrpc" : "2.0", "result" : {"name" : "'.$file_name.'", "thumb" : "'.$thumb_url.'"}, "id" : "id"}');
 	}
 
 }
