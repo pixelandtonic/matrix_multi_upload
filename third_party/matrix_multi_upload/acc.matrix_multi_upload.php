@@ -124,7 +124,7 @@ class Matrix_multi_upload_acc {
 					$this->_include_theme_js('lib/plupload/js/jquery.plupload.queue.min.js');
 
 					// make the upload URL available to JS
-					$this->_include_theme_css('lib/plupload/examples/css/plupload.queue.css');
+					$this->_include_theme_css('styles/matrix_multi_upload.css');
 					$this->_insert_js('MatrixMultiUpload.uploadUrl = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
 
 
