@@ -14,8 +14,14 @@ $tab.bind('click.matrix_multi_upload', function(){
 		// only initialize once
 		$tab.unbind('click.matrix_multi_upload');
 
+		var $pane = $('#matrix_multi_upload'),
+			$sections = $('.accessorySection', $pane);
+
 		// is Matrix 2.0.8+ being used?
-		if (typeof Matrix == 'undefined' || typeof Matrix.instances == 'undefined') return;
+		if (typeof Matrix == 'undefined' || typeof Matrix.instances == 'undefined') {
+			$sections.last().remove();
+			return;
+		}
 
 		// find File cols on this page
 		var targetCols = [];
@@ -37,10 +43,12 @@ $tab.bind('click.matrix_multi_upload', function(){
 		}
 
 		// quit if no File cols
-		if (! targetCols.length) return;
+		if (! targetCols.length) {
+			$sections.last().remove();
+			return;
+		}
 
-		var $pane = $('#matrix_multi_upload'),
-			$targetDir = $('select[name=matrix_multi_upload_dir]', $pane),
+		var $targetDir = $('select[name=matrix_multi_upload_dir]', $pane),
 			$uploader = $('#matrix_multi_upload_uploader', $pane);
 
 		// create the Target Col select
