@@ -73,14 +73,28 @@ $tab.bind('click.matrix_multi_upload', function(){
 		uploader.bind('FileUploaded', function(uploader, file, response) {
 
 			// do we have a filename?
-			if (! response.response) return;
+			if (! response.response) {
+				$.ee_notice('An unknown error occurred while uploading '+file.name, {type: 'error'});
+				return;
+			}
+
+			// parse the response JSON
+			//  - we'll swap this with $.parseJSON once EE gets jQuery 1.4.1+
+			response = JSON.parse(response.response);
+
+			// was there an error?
+			if (response.error) {
+				// show the error notification and quit
+				$.ee_notice(response.error.message, {type: 'error'});
+				return;
+			}
 
 			var targetCol = targetCols[$targetCol.val()],
 				row = targetCol.matrix.addRow(),
 				cell = row.cells[targetCol.index];
 
 			// select the new file
-			cell.selectFile($targetDir.val(), response.response);
+			cell.selectFile($targetDir.val(), response.result.name);
 		});
 
 	}, 1);

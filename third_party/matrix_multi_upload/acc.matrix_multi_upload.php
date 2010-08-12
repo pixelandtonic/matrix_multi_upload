@@ -122,6 +122,7 @@ class Matrix_multi_upload_acc {
 					$this->EE->cp->add_to_foot('<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>');
 					$this->_include_theme_js('lib/plupload/js/plupload.full.min.js');
 					$this->_include_theme_js('lib/plupload/js/jquery.plupload.queue.min.js');
+					$this->_include_theme_js('lib/json2.js');
 
 					// make the upload URL available to JS
 					$this->_include_theme_css('styles/matrix_multi_upload.css');

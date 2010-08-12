@@ -50,8 +50,7 @@ class Matrix_multi_upload_mcp {
 			&& $query->num_rows()
 		))
 		{
-			//exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to find upload directory."}, "id" : "id"}');
-			exit();
+			exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to find upload directory."}, "id" : "id"}');
 		}
 
 		// get the full path, without a trailing slash
@@ -77,7 +76,7 @@ class Matrix_multi_upload_mcp {
 		// Clean the fileName for security reasons
 		$fileName = preg_replace('/[^\w\._]+/', '', $fileName);
 
-		// find a unique file name
+		// Make sure the fileName is unique
 		if (file_exists($path . DIRECTORY_SEPARATOR . $fileName))
 		{
 			$ext = strrpos($fileName, '.');
@@ -111,8 +110,7 @@ class Matrix_multi_upload_mcp {
 		}
 		else
 		{
-			//exit('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
-			exit();
+			exit('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
 		}
 
 		// Look for the content type header
@@ -126,7 +124,7 @@ class Matrix_multi_upload_mcp {
 			$contentType = $_SERVER["CONTENT_TYPE"];
 		}
 
-		if (strpos($contentType, "multipart") !== false)
+		if (isset($contentType) && strpos($contentType, "multipart") !== false)
 		{
 			if (isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']))
 			{
@@ -147,8 +145,7 @@ class Matrix_multi_upload_mcp {
 					}
 					else
 					{
-						//exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-						exit();
+						exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 					}
 
 					fclose($out);
@@ -156,14 +153,12 @@ class Matrix_multi_upload_mcp {
 				}
 				else
 				{
-					//exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-					exit();
+					exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 				}
 			}
 			else
 			{
-				//exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
-				exit();
+				exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
 			}
 		}
 		else
@@ -185,25 +180,19 @@ class Matrix_multi_upload_mcp {
 				}
 				else
 				{
-					//exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
-					exit();
+					exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 				}
 
 				fclose($out);
 			}
 			else
 			{
-				//exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-				exit();
+				exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
 			}
 		}
 
 		// Return JSON-RPC response
-		//exit('{"jsonrpc" : "2.0", "result" : {"dirUrl" : "'.$url.'", "fileName" : "'.$fileName.'"}, "id" : "id"}');
-
-		// Can't use $.parseJSON until EE2 gets jQuery 1.4.1+,
-		// so for now we'll just spit out the actual file name.
-		exit($fileName);
+		exit('{"jsonrpc" : "2.0", "result" : {"name" : "'.$fileName.'"}, "id" : "id"}');
 	}
 
 }
