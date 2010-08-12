@@ -1,0 +1,109 @@
+/*-- resets --*/
+html,body,h1,h2,h3,h4,h5,h6,p,ul,ol,li,dd,dt,dl { margin: 0; padding: 0; font-size: 1em; font-weight: normal; }
+ul { list-style-type: none; }
+img { border: none; }
+.button::-moz-focus-inner { border: 0; }
+article,aside,details,figure,footer,header,hgroup,menu,nav,section { display: block; margin: 0; }
+
+
+/*-- multipurpose --*/
+.clear { clear: both; }
+.clearafter { zoom: 1; }
+.clearafter:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+
+.nowrap { white-space: nowrap; }
+
+
+/*-- links --*/
+a, a.block em, #sidebar p a em { outline: none; color: #b38600; text-decoration: none; }
+a:hover, a.block:hover em, #sidebar p a:hover em { color: #806000; }
+
+a.block, #sidebar p a { display: block; color: inherit; text-decoration: none; }
+a.block em, #sidebar p a em { font-style: normal; font-weight: bold; }
+
+
+/*-- layout --*/
+html { background: #eee; height: 100%; }
+body { font-family: sans-serif; font-size: 13px; line-height: 1.4; min-height: 100%; }
+body.page { background: #fff; }
+
+body#docs { height: 100%; }
+#content { margin-right: 290px; border-right: 1px solid #ddd; min-height: 100%; background: #fff; overflow-x: auto; }
+#page { padding: 40px; position: relative; z-index: 1; }
+#pt { display: block; position: fixed; right: 25px; bottom: 15px; width: 42px; height: 33px; }
+
+
+/*-- sidebar --*/
+#sidebar { position: fixed; top: 40px; right: 40px; width: 210px; color: #999; }
+#sidebar h1 { font-size: 1.2em; font-weight: bold; text-shadow: 0 1px #fff; }
+#sidebar ul li { margin-top: 6px; font-weight: bold; text-shadow: 0 1px #fff; }
+#sidebar ul li a { font-weight: normal; text-shadow: none; }
+#sidebar ul li a.selected { color: #4d3900; text-shadow: 1px 1px 1px rgba(0,0,0,0.15); cursor: default; }
+#sidebar ul ul { margin: 0 0 10px 20px; }
+
+#sidebar p { margin: 30px -8px; }
+#sidebar p a { padding: 5px 7px 5px 46px; background: #fff no-repeat 7px 7px;
+	border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	-moz-box-shodow: 0 1px 2px rgba(0,0,0,0.2); }
+
+#sidebar a#help { background-image: url(../Images/help.png); }
+#sidebar a#donate { background-image: url(../Images/donate.png); }
+
+
+/*-- sections --*/
+#page section { margin-top: 40px; padding: 30px 0 0 40px; border-top: 1px dashed #ddd;}
+#page section:first-child,
+#page h1 + section { margin-top: 0; border-top: none; padding-top: 0; }
+
+#page section > *:first-child { margin-top: 0; margin-left: -40px; }
+#page section > h3:first-child { margin-bottom: 1em; }
+#page section > *:last-child { margin-bottom: 0; }
+#page section pre code { margin-left: -80px; }
+#page section pre code { padding-left: 80px; }
+#page section dd pre code { margin-left: -120px; padding-left: 120px; }
+
+
+/*-- elements --*/
+#page p { margin: 0.5em 0 1.5em; }
+#page hr { margin: 30px 0; border: none; border-top: 1px dashed #ddd; height: 0; padding: 0; }
+
+/* headings */
+#page h1 { margin: 0 0 1em; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.04em; font-weight: bold; color: #4d3900; text-shadow: 1px 1px 1px rgba(0,0,0,0.15); }
+#page h2 { margin: 30px 0 1em; font-size: 2em; letter-spacing: -0.04em; color: #87a621; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+#page h3 { margin: 40px 0 0.5em; font-size: 1.5em; color: #87a621; }
+#page h4 { margin: 2em 0 0; font-size: 1.25em; font-weight: bold; }
+#page h5 { margin: 1.5em 0 0.5em; font-size: 1em; font-weight: bold; }
+#page h6 { font-size: 0.9em; color: #999; }
+#page h2:first-child,
+#page h3:first-child { margin-top: 0; }
+
+/* lists */
+#page ul.square,
+#page ol { margin: 1em 0 1em 40px; }
+#page ul.square { list-style-type: square; }
+#page ul.square li:not(:last-child),
+#page ol li:not(:last-child) { margin-bottom: 0.2em; }
+
+#page dl { margin: 0.5em 0 1.5em 20px; }
+#page dl dt { margin: 1.5em 0 0.5em; font-size: 1em; font-weight: bold; }
+#page dl dt:first-child { margin-top: 0; }
+#page dl dd { margin-left: 20px; }
+
+/* code */
+#page code { font-family: Menlo, Monaco, monospace; line-height: 1; font-size: 0.9em; }
+#page code em { background: #fffdd3 !important; font-style: normal; }
+#page h5 code { color: #000; }
+#page pre { margin: 1.5em 0; }
+#page pre code { display: block; margin: 0 -40px; border-top: 1px solid #eaeaea; padding: 1em 5px 1em 40px; line-height: 1.4em; background: #f3f3f3; overflow: auto; }
+
+#page pre code::-webkit-scrollbar { width: 0; height: 8px; } /* the scrollbar area */
+#page pre code::-webkit-scrollbar-button { display: none; } /* the left and right arrows */
+#page pre code::-webkit-scrollbar-thumb { background: #ddd; -webkit-border-radius: 4px; }
+
+#page kbd { font-family: inherit; color: #68801a; white-space: nowrap; font-family: Menlo, Monaco, monospace; line-height: 1; font-size: 0.9em; }
+
+/* notes */
+#page .note { margin: 2em 0 0; border: 1px solid #ffe599; padding: 10px 12px; background: #fffdd3; }
+#page .note h5 { margin-top: 0; }
+#page .note p { margin-bottom: 0; }
