@@ -7,11 +7,15 @@ var MatrixMultiUploadURL;
 var $tab = $('#accessoryTabs a.matrix_multi_upload');
 
 $tab.bind('click.matrix_multi_upload', function(){
+
 	// wait for the tab to show
 	setTimeout(function(){
 
 		// only initialize once
 		$tab.unbind('click.matrix_multi_upload');
+
+		// is Matrix 2.0.8+ being used?
+		if (typeof Matrix == 'undefined' || typeof Matrix.instances == 'undefined') return;
 
 		// find File cols on this page
 		var targetCols = [];
@@ -25,7 +29,8 @@ $tab.bind('click.matrix_multi_upload', function(){
 					targetCols.push({
 						label:  matrix.label+' - '+col.label,
 						matrix: matrix,
-						col:    col
+						col:    col,
+						index:  c
 					});
 				}
 			}
@@ -65,9 +70,18 @@ $tab.bind('click.matrix_multi_upload', function(){
 			uploader.settings.url = getURL();
 		});
 
-		//uploader.bind('UploadProgress', function(up, file) {
-		//	$('#' + file.id + " span").html(file.percent + "%");
-		//});
+		uploader.bind('FileUploaded', function(uploader, file, response) {
+
+			// do we have a filename?
+			if (! response.response) return;
+
+			var targetCol = targetCols[$targetCol.val()],
+				row = targetCol.matrix.addRow(),
+				cell = row.cells[targetCol.index];
+
+			// select the new file
+			cell.selectFile($targetDir.val(), response.response);
+		});
 
 	}, 1);
 });

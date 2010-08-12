@@ -44,13 +44,30 @@ class Matrix_multi_upload_mcp {
 		header("Pragma: no-cache");
 
 		// Settings
-		//$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
-		$targetDir = "/Users/brandon/Sites/ee2sandbox.dev/images/uploads/";
-		$maxFileAge = 60 * 60; // Temp file age in seconds
+		//$path = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
+		if (!( ($dir = $this->EE->input->get('dir'))
+			&& ($query = $this->EE->db->query('SELECT server_path, url FROM exp_upload_prefs WHERE id = "'.$dir.'"'))
+			&& $query->num_rows()
+		))
+		{
+			//exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to find upload directory."}, "id" : "id"}');
+			exit();
+		}
 
-		// 5 minutes execution time
-		@set_time_limit(5 * 60);
-		// usleep(5000);
+		// get the full path, without a trailing slash
+		$path = $query->row('server_path');
+		if (substr($path, 0, 1) != '/') $path = BASEPATH . $path;
+		if (substr($path, -1) == '/') $path = substr($path, 0, -1);
+
+		// get the URL, *with* a trailing slash
+		$url = $query->row('url');
+		if (substr($url, -1) != '/') $url .= '/';
+
+		// Temp file age in seconds (60 x 60)
+		$maxFileAge = 3600;
+
+		// 5 minutes execution time (5 x 60)
+		@set_time_limit(300);
 
 		// Get parameters
 		$chunk = isset($_REQUEST["chunk"]) ? $_REQUEST["chunk"] : 0;
@@ -60,71 +77,133 @@ class Matrix_multi_upload_mcp {
 		// Clean the fileName for security reasons
 		$fileName = preg_replace('/[^\w\._]+/', '', $fileName);
 
-		// Create target dir
-		if (!file_exists($targetDir))
-			@mkdir($targetDir);
+		// find a unique file name
+		if (file_exists($path . DIRECTORY_SEPARATOR . $fileName))
+		{
+			$ext = strrpos($fileName, '.');
+			$fileName_a = substr($fileName, 0, $ext);
+			$fileName_b = substr($fileName, $ext);
+
+			$count = 1;
+			while (file_exists($path . DIRECTORY_SEPARATOR . $fileName_a . '_' . $count . $fileName_b))
+			{
+				$count++;
+			}
+
+			$fileName = $fileName_a . '_' . $count . $fileName_b;
+		}
 
 		// Remove old temp files
-		if (is_dir($targetDir) && ($dir = opendir($targetDir))) {
-			while (($file = readdir($dir)) !== false) {
-				$filePath = $targetDir . DIRECTORY_SEPARATOR . $file;
+		if (is_dir($path) && ($dir = opendir($path)))
+		{
+			while (($file = readdir($dir)) !== false)
+			{
+				$filePath = $path . DIRECTORY_SEPARATOR . $file;
 
 				// Remove temp files if they are older than the max age
 				if (preg_match('/\\.tmp$/', $file) && (filemtime($filePath) < time() - $maxFileAge))
+				{
 					@unlink($filePath);
+				}
 			}
 
 			closedir($dir);
-		} else
-			die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
+		}
+		else
+		{
+			//exit('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
+			exit();
+		}
 
 		// Look for the content type header
 		if (isset($_SERVER["HTTP_CONTENT_TYPE"]))
+		{
 			$contentType = $_SERVER["HTTP_CONTENT_TYPE"];
+		}
 
 		if (isset($_SERVER["CONTENT_TYPE"]))
+		{
 			$contentType = $_SERVER["CONTENT_TYPE"];
+		}
 
-		if (strpos($contentType, "multipart") !== false) {
-			if (isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+		if (strpos($contentType, "multipart") !== false)
+		{
+			if (isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']))
+			{
 				// Open temp file
-				$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
-				if ($out) {
+				$out = fopen($path . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
+
+				if ($out)
+				{
 					// Read binary input stream and append it to temp file
 					$in = fopen($_FILES['file']['tmp_name'], "rb");
 
-					if ($in) {
+					if ($in)
+					{
 						while ($buff = fread($in, 4096))
+						{
 							fwrite($out, $buff);
-					} else
-						die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+						}
+					}
+					else
+					{
+						//exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+						exit();
+					}
 
 					fclose($out);
 					unlink($_FILES['file']['tmp_name']);
-				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
-		} else {
+				}
+				else
+				{
+					//exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+					exit();
+				}
+			}
+			else
+			{
+				//exit('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+				exit();
+			}
+		}
+		else
+		{
 			// Open temp file
-			$out = fopen($targetDir . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
-			if ($out) {
+			$out = fopen($path . DIRECTORY_SEPARATOR . $fileName, $chunk == 0 ? "wb" : "ab");
+
+			if ($out)
+			{
 				// Read binary input stream and append it to temp file
 				$in = fopen("php://input", "rb");
 
-				if ($in) {
+				if ($in)
+				{
 					while ($buff = fread($in, 4096))
+					{
 						fwrite($out, $buff);
-				} else
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					}
+				}
+				else
+				{
+					//exit('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					exit();
+				}
 
 				fclose($out);
-			} else
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+			}
+			else
+			{
+				//exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+				exit();
+			}
 		}
 
 		// Return JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		//exit('{"jsonrpc" : "2.0", "result" : {"dirUrl" : "'.$url.'", "fileName" : "'.$fileName.'"}, "id" : "id"}');
+
+		// Can't use $.parseJSON until EE2 gets jQuery 1.4.1+,
+		// so for now we'll just spit out the actual file name.
+		exit($fileName);
 	}
 
 }
