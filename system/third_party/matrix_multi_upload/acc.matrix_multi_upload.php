@@ -13,7 +13,7 @@ class Matrix_multi_upload_acc {
 
 	var $name        = 'Matrix Multi-Upload';
 	var $id          = 'matrix_multi_upload';
-	var $version     = '1.0';
+	var $version     = '0.9';
 	var $description = 'My accessory has a lovely description.';
 	var $sections    = array();
 
