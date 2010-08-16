@@ -27,6 +27,13 @@ class Matrix_multi_upload_upd {
 	 */
 	function install()
 	{
+		$this->EE->db->insert('modules', array(
+			'module_name'        => 'Matrix_multi_upload',
+			'module_version'     => $this->version,
+			'has_cp_backend'     => 'n',
+			'has_publish_fields' => 'n'
+		));
+
 		// add the upload action
 		$this->EE->db->insert('actions', array(
 			'class'  => 'Matrix_multi_upload_mcp',
