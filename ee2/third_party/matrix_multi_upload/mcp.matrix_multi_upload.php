@@ -70,6 +70,14 @@ class Matrix_multi_upload_mcp {
 			$this->_error('104');
 		}
 
+		// relative paths are usually relative to the system directory,
+		// but Assets' AJAX functions are loaded via the site URL
+		// so attempt to turn relative paths into absolute paths
+		if (! preg_match('/^(\/|\\\|[a-zA-Z]+:)/', $path))
+		{
+			$path = SYSDIR.'/'.$path;
+		}
+
 		if (function_exists('realpath') AND @realpath($path) !== FALSE)
 		{
 			$path = str_replace("\\", "/", realpath($path));
