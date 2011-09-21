@@ -1,5 +1,6 @@
 
-#matrix_multi_upload label { display: block; margin: 10px 0 3px; }
+#matrix_multi_upload p { margin: -13px 0 18px; width: 230px; height: 2em; }
+#matrix_multi_upload p.notice { margin-top: 0; font-size: 12px; }
 
 /* 
    Plupload

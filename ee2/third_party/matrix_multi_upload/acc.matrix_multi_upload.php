@@ -13,8 +13,8 @@ class Matrix_multi_upload_acc {
 
 	var $name        = 'Matrix Multi-Upload';
 	var $id          = 'matrix_multi_upload';
-	var $version     = '0.9';
-	var $description = 'Upload multiple files to Matrix at once, powered by <a href="http://www.plupload.com/">Plupload</a>';
+	var $version     = '1.0';
+	var $description = 'Upload multiple files to Matrix at once';
 	var $sections    = array();
 
 	/**
@@ -86,6 +86,8 @@ class Matrix_multi_upload_acc {
 		// are we on the Publish page?
 		if ($this->EE->input->get('C') == 'content_publish' && $this->EE->input->get('M') == 'entry_form')
 		{
+			$this->EE->lang->loadfile('matrix_multi_upload');
+
 			$query = $this->EE->db->query('SELECT action_id FROM exp_actions WHERE class = "Matrix_multi_upload_mcp" AND method = "upload"');
 
 			// is the module installed?
@@ -106,36 +108,49 @@ class Matrix_multi_upload_acc {
 						$upload_dirs[$row->id] = $row->name;
 					}
 
-					$settings_html = '<div><strong><label for="matrix_multi_upload_dir">Upload Directory</label></strong></div>'
-					               . form_dropdown('matrix_multi_upload_dir', $upload_dirs)
-					               . '<div><strong><label for="matrix_multi_upload_target">Target Matrix Field/Column</label></strong></div>'
-					               . '<div id="matrix_multi_upload_target">No Matrix fields with a File column exist on this page.</div>';
-
-					// uploader
+					// add the Matrix Column section
+					$this->sections['1. '.lang('choose_col')] = '<p>'.lang('choose_col_info').'</p>'
+					                                    . '<div id="mmu_matrix_col"><p class="notice">'.lang('choose_col_notice').'</p></div>';
 
 					// get the site index
 					if (($site_index = $this->EE->config->item('playa_site_index')) === FALSE) $site_index = $this->EE->functions->fetch_site_index(0, 0);
 
 					// include JS
-					$this->_include_theme_js('scripts/matrix_multi_upload.js');
 					$this->_include_theme_js('lib/plupload/js/gears_init.js');
 					$this->EE->cp->add_to_foot('<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>');
 					$this->_include_theme_js('lib/plupload/js/plupload.full.min.js');
 					$this->_include_theme_js('lib/plupload/js/jquery.plupload.queue.min.js');
 					$this->_include_theme_js('lib/json2.js');
 
+					$this->_include_theme_js('scripts/matrix_multi_upload.js');
+
 					// make the upload URL available to JS
 					$this->_include_theme_css('styles/matrix_multi_upload.css');
-					$this->_insert_js('MatrixMultiUploadURL = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
+					$this->_insert_js('MMU.FileHandler.uploadUrl = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
 
+					// add the Plupload sections
+					$this->sections['2. '.lang('choose_filedir')] = '<p>'.lang('choose_filedir_info').'</p>'
+					                                        . form_dropdown('mmu_filedir', $upload_dirs, '', 'id="mmu_filedir"');
 
-					$upload_html = '<div id="matrix_multi_upload_uploader" style="width: 450px; height: 330px;">'
-					             .   'You browser doesn’t support multi-file uploading.'
-					             . '</div>';
+					$this->sections[lang('upload_files')]   = '<div id="mmu_plupload" style="width: 450px; height: 330px;">'
+					                                        .   'You browser doesn’t support multi-file uploading.'
+					                                        . '</div>';
 
-					// add the sections
-					$this->sections['Settings'] = $settings_html;
-					$this->sections['Upload Files'] = $upload_html;
+					// -------------------------------------------
+					//  Assets integration
+					// -------------------------------------------
+
+					if (array_key_exists('assets', $this->EE->addons->get_installed()))
+					{
+						$this->sections['2. '.lang('choose_files')] = '<p>'.lang('choose_files_info').'</p>'
+						                                            . '<input id="mmu_choose_files" type="button" value="'.lang('choose_files').'">';
+
+						// include the sheet resources
+						require_once PATH_THIRD.'assets/helper.php';
+						$assets_helper = new Assets_helper;
+						$assets_helper->include_sheet_resources();
+					}
+
 				}
 				else
 				{
