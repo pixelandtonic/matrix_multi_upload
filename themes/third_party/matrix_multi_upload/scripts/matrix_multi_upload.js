@@ -243,7 +243,7 @@ MMU.AssetsHandler = {
 			var row = MMU.selectedCol.matrix.addRow(),
 				cell = row.cells[MMU.selectedCol.index];
 
-			cell.assetsField.selectFiles([files[i]]);
+			cell.assetsField._selectFiles([files[i]]);
 		}
 	},
 
