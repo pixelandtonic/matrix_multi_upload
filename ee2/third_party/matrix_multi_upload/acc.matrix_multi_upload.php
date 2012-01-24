@@ -1,6 +1,9 @@
 <?php if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 
+require_once PATH_THIRD.'matrix_multi_upload/helper.php';
+
+
 /**
  * Matrix Multi Upload Accessory Class for EE2
  *
@@ -96,15 +99,15 @@ class Matrix_multi_upload_acc {
 
 				// Prefs
 
-				$this->EE->load->model('tools_model');
-				$upload_prefs = $this->EE->tools_model->get_upload_preferences($this->EE->session->userdata('group_id'));
+				$group_id = $this->EE->session->userdata('group_id');
+				$upload_prefs = Matrix_multi_upload_helper::get_upload_preferences($group_id);
 
 				// are there any upload directories?
-				if ($upload_prefs->num_rows())
+				if ($upload_prefs)
 				{
-					foreach($upload_prefs->result() as $row)
+					foreach($upload_prefs as $row)
 					{
-						$upload_dirs[$row->id] = $row->name;
+						$upload_dirs[$row['id']] = $row['name'];
 					}
 
 					// add the Matrix Column section

@@ -1,6 +1,9 @@
 <?php if (! defined('BASEPATH')) exit('Invalid file request');
 
 
+require_once PATH_THIRD.'matrix_multi_upload/helper.php';
+
+
 /**
  * Matrix Multi-Upload Module CP Class
  *
@@ -52,18 +55,15 @@ class Matrix_multi_upload_mcp {
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
 
-		$this->EE->load->library('filemanager');
-		$this->EE->load->model('tools_model');
-
 		// Get the upload prefs
+		$group_id = $this->EE->session->userdata('member_group');
 		$upload_id = $this->EE->input->get('dir');
-		$upload_dir_result = $this->EE->tools_model->get_upload_preferences($this->EE->session->userdata('member_group'), $upload_id);
-		$upload_dir_prefs = $upload_dir_result->row();
+		$upload_dir_prefs = Matrix_multi_upload_helper::get_upload_preferences($group_id, $upload_id);
 
 
 		// validate upload path
 
-		$path = $upload_dir_prefs->server_path;
+		$path = $upload_dir_prefs['server_path'];
 
 		if (! $path)
 		{
@@ -229,7 +229,7 @@ class Matrix_multi_upload_mcp {
 		$thumb_path = $path.'_thumbs';
 		$thumb_name = 'thumb_'.$file_name;
 
-		$thumb_url = $upload_dir_prefs->url;
+		$thumb_url = $upload_dir_prefs['url'];
 		if (substr($thumb_url, -1) != '/') $thumb_url .= '/';
 		$thumb_url .= '_thumbs/'.$thumb_name;
 
