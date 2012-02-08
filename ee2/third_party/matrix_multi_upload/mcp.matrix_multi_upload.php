@@ -227,7 +227,10 @@ class Matrix_multi_upload_mcp {
 		// upload sucessful, now create thumb
 
 		$thumb_path = $path.'_thumbs';
-		$thumb_name = 'thumb_'.$file_name;
+		//$thumb_name = 'thumb_'.$file_name;
+		//the above line was causing issues for previous users of MMU, a hack was introduced by the community
+		//implementing hack
+		$thumb_name = ''.$file_name;
 
 		$thumb_url = $upload_dir_prefs['url'];
 		if (substr($thumb_url, -1) != '/') $thumb_url .= '/';
