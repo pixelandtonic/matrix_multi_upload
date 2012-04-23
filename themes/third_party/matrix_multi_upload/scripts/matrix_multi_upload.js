@@ -2,6 +2,8 @@
 
 MMU = {
 
+	assetsInstalled: false,
+
 	/**
 	 * Initialize
 	 */
@@ -25,7 +27,7 @@ MMU = {
 		this.cols = [];
 
 		// should we be looking for Assets cols as well?
-		var assetsInstalled = (typeof Assets != 'undefined');
+		this.assetsInstalled = (typeof Assets != 'undefined');
 
 		for (var i in Matrix.instances) {
 			var matrix = Matrix.instances[i];
@@ -33,7 +35,7 @@ MMU = {
 			for (var c in matrix.cols) {
 				var col = matrix.cols[c];
 
-				if (col.type == 'file' || (assetsInstalled && col.type == 'assets')) {
+				if (col.type == 'file' || (this.assetsInstalled && col.type == 'assets')) {
 					this.cols.push({
 						label:  matrix.label+' - '+col.label,
 						matrix: matrix,
@@ -51,7 +53,7 @@ MMU = {
 
 		// initialize the upload handlers
 		MMU.FileHandler.init();
-		if (assetsInstalled) MMU.AssetsHandler.init();
+		if (this.assetsInstalled) MMU.AssetsHandler.init();
 
 		// create the Matrix Col select
 		this.$colSelect = $('<select id="mmu_matrix_col" />');
@@ -76,9 +78,9 @@ MMU = {
 
 		if (this.selectedCol.col.type == 'file') {
 			this.FileHandler.show();
-			this.AssetsHandler.hide();
+			if (this.assetsInstalled) this.AssetsHandler.hide();
 		} else {
-			this.AssetsHandler.show();
+			if (this.assetsInstalled) this.AssetsHandler.show();
 			this.FileHandler.hide();
 		}
 	}
