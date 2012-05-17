@@ -110,7 +110,7 @@ MMU.FileHandler = {
 
 		// initialize Plupload
 		this.$plupload.pluploadQueue({
-			runtimes: 'gears,html5,flash,silverlight,browserplus',
+			runtimes: 'html5,flash',
 			url: this.getUploadUrl()
 		});
 

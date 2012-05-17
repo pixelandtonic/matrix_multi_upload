@@ -117,13 +117,11 @@ class Matrix_multi_upload_acc {
 					// get the site index
 					if (($site_index = $this->EE->config->item('playa_site_index')) === FALSE) $site_index = $this->EE->functions->fetch_site_index(0, 0);
 
-					// include JS
-					$this->_include_theme_js('lib/plupload/js/gears_init.js');
-					$this->EE->cp->add_to_foot('<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>');
-					$this->_include_theme_js('lib/plupload/js/plupload.full.min.js');
-					$this->_include_theme_js('lib/plupload/js/jquery.plupload.queue.min.js');
-					$this->_include_theme_js('lib/json2.js');
-
+					// include CSS and JS
+					$this->_include_theme_js('lib/plupload/js/plupload.js');
+					$this->_include_theme_js('lib/plupload/js/plupload.html5.js');
+					$this->_include_theme_js('lib/plupload/js/plupload.flash.js');
+					$this->_include_theme_js('lib/plupload/js/jquery.plupload.queue/jquery.plupload.queue.js');
 					$this->_include_theme_js('scripts/matrix_multi_upload.js');
 
 					// make the upload URL available to JS

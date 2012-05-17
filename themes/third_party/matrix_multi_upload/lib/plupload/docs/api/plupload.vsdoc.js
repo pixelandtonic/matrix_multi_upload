@@ -67,6 +67,7 @@ plupload.Uploader = function(settings) {
 	/// <summary>Uploader class, an instance of this class will be created for each upload field.</summary>
 	/// <param name="settings" type="Object">Initialization settings, to be used by the uploader instance and runtimes.</param>
 	/// <field name="state" type="Number">Current state of the total uploading progress. This one can either be plupload.STARTED or plupload.STOPPED. These states are controlled by the stop/start methods. The default value is STOPPED.</field>
+	/// <field name="runtime" type="String">Current runtime name.</field>
 	/// <field name="features" type="Object">Map of features that are available for the uploader runtime. Features will be filled before the init event is called, these features can then be used to alter the UI for the end user. Some of the current features that might be in this map is: dragdrop, chunks, jpgresize, pngresize.</field>
 	/// <field name="files" type="Array">Current upload queue, an array of File instances.</field>
 	/// <field name="settings" type="Object">Object with name/value settings.</field>
@@ -125,6 +126,14 @@ plupload.Uploader.prototype.unbind = function(name, func) {
 	/// <summary>Removes the specified event listener.</summary>
 	/// <param name="name" type="String">Name of event to remove.</param>
 	/// <param name="func" type="function">Function to remove from listener.</param>
+}
+
+plupload.Uploader.prototype.unbindAll = function() {
+	/// <summary>Removes all event listeners.</summary>
+}
+
+plupload.Uploader.prototype.destroy = function() {
+	/// <summary>Destroys Plupload instance and cleans after itself.</summary>
 }
 
 plupload.File = function(id, name, size) {

@@ -153,6 +153,10 @@ uploader.init();</example>
 These states are controlled by the stop/start methods. The default value is STOPPED.
 </description>
 </property>
+<property name="runtime" summary="Current runtime name." type="String">
+<description>Current runtime name.
+</description>
+</property>
 <property name="features" summary="Map of features that are available for the uploader runtime." type="Object">
 <description>Map of features that are available for the uploader runtime. Features will be filled
 before the init event is called, these features can then be used to alter the UI for the end user.
@@ -257,6 +261,14 @@ This would for example reposition flash/silverlight shims on the page.
 <description>Function to remove from listener.</description>
 </param>
 </method>
+<method name="unbindAll" summary="Removes all event listeners.">
+<description>Removes all event listeners.
+</description>
+</method>
+<method name="destroy" summary="Destroys Plupload instance and cleans after itself.">
+<description>Destroys Plupload instance and cleans after itself.
+</description>
+</method>
 <event name="Init" summary="Fires when the current RunTime has been initialized.">
 <description>Fires when the current RunTime has been initialized.
 </description>
@@ -287,6 +299,17 @@ This would for example reposition flash/silverlight shims on the page.
 </event>
 <event name="UploadFile" summary="Fires when a file is to be uploaded by the runtime.">
 <description>Fires when a file is to be uploaded by the runtime.
+</description>
+<param name="uploader" type="plupload.Uploader">
+<description>Uploader instance sending the event.</description>
+</param>
+<param name="file" type="plupload.File">
+<description>File to be uploaded.</description>
+</param>
+</event>
+<event name="BeforeUpload" summary="Fires when just before a file is uploaded.">
+<description>Fires when just before a file is uploaded. This event enables you to override settings
+on the uploader instance before the file is uploaded.
 </description>
 <param name="uploader" type="plupload.Uploader">
 <description>Uploader instance sending the event.</description>
@@ -358,6 +381,16 @@ This would for example reposition flash/silverlight shims on the page.
 <description>Object with response properties.</description>
 </param>
 </event>
+<event name="UploadComplete" summary="Fires when all files in a queue are uploaded.">
+<description>Fires when all files in a queue are uploaded.
+</description>
+<param name="uploader" type="plupload.Uploader">
+<description>Uploader instance sending the event.</description>
+</param>
+<param name="files" type="Array">
+<description>Array of file objects that was added to queue/selected by the user.</description>
+</param>
+</event>
 <event name="Error" summary="Fires when a error occurs.">
 <description>Fires when a error occurs.
 </description>
@@ -366,6 +399,13 @@ This would for example reposition flash/silverlight shims on the page.
 </param>
 <param name="error" type="Object">
 <description>Contains code, message and sometimes file and other details.</description>
+</param>
+</event>
+<event name="Destroy" summary="Fires when destroy method is called.">
+<description>Fires when destroy method is called.
+</description>
+<param name="uploader" type="plupload.Uploader">
+<description>Uploader instance sending the event.</description>
 </param>
 </event>
 </members>
