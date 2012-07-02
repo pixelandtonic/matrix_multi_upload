@@ -224,22 +224,35 @@ class Matrix_multi_upload_mcp {
 		}
 
 
-        // store the data about upload and generate a thumbnail
+		// store the data about upload and generate a thumbnail
 
-        $this->EE->load->library('filemanager');
+		$this->EE->load->library('filemanager');
 
-        $this->EE->filemanager->save_file($file_path, $upload_id, array('file_name' => $file_name));
+		$prefs['rel_path'] = $file_path;
+		$prefs['file_name'] = $file_name;
+		$prefs['file_size'] = filesize($file_path);
+		$prefs['uploaded_by_member_id'] = $this->EE->session->userdata('member_id');
 
-        $thumb_url = $upload_dir_prefs['url'];
-        if (substr($thumb_url, -1) != '/')
-        {
-            $thumb_url .= '/';
-        }
+		$file_size = getimagesize($file_path);
+		if ($file_size !== FALSE)
+		{
+			$prefs['file_hw_original'] = $file_size[1].' '.$file_size[0];
+		}
 
-        $thumb_url .= '_thumbs/'.$file_name;
+		$this->EE->filemanager->save_file($file_path, $upload_id, $prefs);
+
+		// Get the thumb URL
+
+		$thumb_url = $upload_dir_prefs['url'];
+		if (substr($thumb_url, -1) != '/')
+		{
+			$thumb_url .= '/';
+		}
+
+		$thumb_url .= '_thumbs/'.$file_name;
 
 
-        // Return JSON-RPC response
+		// Return JSON-RPC response
 		exit('{"jsonrpc" : "2.0", "result" : {"name" : "'.$file_name.'", "thumb" : "'.$thumb_url.'"}, "id" : "id"}');
 	}
 
