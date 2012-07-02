@@ -8,7 +8,7 @@ require_once PATH_THIRD.'matrix_multi_upload/helper.php';
  * Matrix Multi-Upload Module CP Class
  *
  * @package   Matrix Multi-Upload
- * @author    Brandon Kelly <brandon@pixelandtonic.com>
+ * @author    Brandon Kelly <brandon@pixelandtonic.com>, Andris Sevcenko <andris@pixelandtonic.com>
  * @copyright Copyright (c) 2010 Pixel & Tonic, LLC
  */
 class Matrix_multi_upload_mcp {
@@ -224,42 +224,26 @@ class Matrix_multi_upload_mcp {
 		}
 
 
-		// upload sucessful, now create thumb
+        // store the data about upload and generate a thumbnail
 
-		$thumb_path = $path.'_thumbs';
+        $this->EE->load->library('filemanager');
 
-		if (version_compare(APP_VER, '2.1.5', '>='))
-		{
-			$thumb_name = $file_name;
-		}
-		else
-		{
-			$thumb_name = 'thumb_'.$file_name;
-		}
+        $this->EE->filemanager->save_file($file_path, $upload_id, array('file_name' => $file_name));
 
-		$thumb_url = $upload_dir_prefs['url'];
-		if (substr($thumb_url, -1) != '/') $thumb_url .= '/';
-		$thumb_url .= '_thumbs/'.$thumb_name;
+        $thumb_url = $upload_dir_prefs['url'];
+        if (substr($thumb_url, -1) != '/')
+        {
+            $thumb_url .= '/';
+        }
 
-		if ( ! is_dir($thumb_path))
-		{
-			mkdir($thumb_path);
-		}
-
-		$resize['source_image']   = $file_path;
-		$resize['new_image']      = $thumb_path.DIRECTORY_SEPARATOR.$thumb_name;
-		$resize['maintain_ratio'] = TRUE;
-		$resize['image_library']  = $this->EE->config->item('image_resize_protocol');
-		$resize['library_path']   = $this->EE->config->item('image_library_path');
-		$resize['width']          = 73;
-		$resize['height']         = 60;
-
-		$this->EE->load->library('image_lib', $resize);
-		$this->EE->image_lib->resize();
+        $thumb_url .= '_thumbs/'.$file_name;
 
 
-		// Return JSON-RPC response
+        // Return JSON-RPC response
 		exit('{"jsonrpc" : "2.0", "result" : {"name" : "'.$file_name.'", "thumb" : "'.$thumb_url.'"}, "id" : "id"}');
 	}
 
 }
+
+/* End of file mcp.matrix_multi_upload.php */
+/* Location: ./system/expressionengine/third_party/matrix/mcp.matrix_multi_upload.php */
