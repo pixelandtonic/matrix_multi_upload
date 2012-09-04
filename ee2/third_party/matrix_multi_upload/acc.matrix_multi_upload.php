@@ -114,8 +114,8 @@ class Matrix_multi_upload_acc {
 					$this->sections['1. '.lang('choose_col')] = '<p>'.lang('choose_col_info').'</p>'
 					                                    . '<div id="mmu_matrix_col"><p class="notice">'.lang('choose_col_notice').'</p></div>';
 
-					// get the site index
-					if (($site_index = $this->EE->config->item('playa_site_index')) === FALSE) $site_index = $this->EE->functions->fetch_site_index(0, 0);
+					// get the site url
+					if (($site_url = $this->EE->config->item('mmu_site_url')) === FALSE) $site_url = $this->EE->functions->fetch_site_index(0, 0);
 
 					// include CSS and JS
 					$this->_include_theme_js('lib/plupload/js/plupload.js');
@@ -126,7 +126,7 @@ class Matrix_multi_upload_acc {
 
 					// make the upload URL available to JS
 					$this->_include_theme_css('styles/matrix_multi_upload.css');
-					$this->_insert_js('MMU.FileHandler.uploadUrl = "'.$site_index.QUERY_MARKER.'ACT='.$action_id.'";');
+					$this->_insert_js('MMU.FileHandler.uploadUrl = "'.$site_url.QUERY_MARKER.'ACT='.$action_id.'";');
 
 					// add the Plupload sections
 					$this->sections['2. '.lang('choose_filedir')] = '<p>'.lang('choose_filedir_info').'</p>'
