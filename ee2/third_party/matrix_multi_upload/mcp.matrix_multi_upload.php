@@ -75,7 +75,16 @@ class Matrix_multi_upload_mcp {
 		// so attempt to turn relative paths into absolute paths
 		if (! preg_match('/^(\/|\\\|[a-zA-Z]+:)/', $path))
 		{
-			$path = SYSDIR.'/'.$path;
+			// if the CP is masked, there's no way for us to determine the path to the CP's entry point
+			// so people with relative upload directory paths _and_ masked CPs will have to point us in the right direction
+			if ($cp_path = $this->EE->assets_lib->normalize_directoryseparator($this->EE->config->item('mmu_cp_path')))
+			{
+				$path = rtrim($cp_path, '/').'/'.$path;
+			}
+			else
+			{
+				$path = SYSDIR.'/'.$path;
+			}
 		}
 
 		if (function_exists('realpath') AND @realpath($path) !== FALSE)
