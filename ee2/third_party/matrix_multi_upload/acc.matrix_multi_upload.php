@@ -16,7 +16,7 @@ class Matrix_multi_upload_acc {
 
 	var $name        = 'Matrix Multi-Upload';
 	var $id          = 'matrix_multi_upload';
-	var $version     = '1.1';
+	var $version     = '1.1.1';
 	var $description = 'Upload multiple files to Matrix at once';
 	var $sections    = array();
 

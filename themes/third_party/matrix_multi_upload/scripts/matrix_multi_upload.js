@@ -79,6 +79,11 @@ MMU = {
 		if (this.selectedCol.col.type == 'file') {
 			this.FileHandler.show();
 			if (this.assetsInstalled) this.AssetsHandler.hide();
+            if (this.selectedCol.col.settings.directory != 'all') {
+                MMU.FileHandler.setPluploadUrl = this.selectedCol.col.settings.directory;
+            } else {
+                MMU.FileHandler.updatePluploadUrl();
+            }
 		} else {
 			if (this.assetsInstalled) this.AssetsHandler.show();
 			this.FileHandler.hide();
@@ -136,6 +141,14 @@ MMU.FileHandler = {
 	updatePluploadUrl: function() {
 		this.plupload.settings.url = this.getUploadUrl();
 	},
+
+    /**
+     * Set Plupload URL according to an upload folder setting
+     * @param upload_dir
+     */
+    setPluploadUrl: function (upload_dir) {
+        this.plupload.settings.url = this.uploadUlr + '&dir=' + upload_dir;
+    },
 
 	/**
 	 * Add Files
