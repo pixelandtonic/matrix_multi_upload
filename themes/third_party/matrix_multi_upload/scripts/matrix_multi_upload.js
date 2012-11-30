@@ -35,7 +35,7 @@ MMU = {
 			for (var c in matrix.cols) {
 				var col = matrix.cols[c];
 
-				if (col.type == 'file' || (this.assetsInstalled && col.type == 'assets')) {
+				if (col.type == 'file' || col.type == 'safecracker_file' || (this.assetsInstalled && col.type == 'assets')) {
 					this.cols.push({
 						label:  matrix.label+' - '+col.label,
 						matrix: matrix,
@@ -84,6 +84,10 @@ MMU = {
             } else {
                 MMU.FileHandler.updatePluploadUrl();
             }
+		} else if (this.selectedCol.col.type == 'safecracker_file') {
+			this.FileHandler.show();
+			if (this.assetsInstalled) this.AssetsHandler.hide();
+			MMU.FileHandler.setPluploadUrl(this.selectedCol.col.settings.safecracker_upload_dir);
 		} else {
 			if (this.assetsInstalled) this.AssetsHandler.show();
 			this.FileHandler.hide();
@@ -177,7 +181,25 @@ MMU.FileHandler = {
 			cell = row.cells[MMU.selectedCol.index];
 
 		// select the new file
-		cell.selectFile(this.$filedirSelect.val(), response.result.name, response.result.thumb);
+		if (cell.col.type == 'file') {
+			cell.selectFile(this.$filedirSelect.val(), response.result.name, response.result.thumb);
+		} else if (cell.col.type == 'safecracker_file') {
+			cell.dom.$td.find('.safecracker_file_set').prepend('<div class="safecracker_file_thumb">'+
+				'<a href="#" class="safecracker_file_remove_button"><img src="'+EE.THEME_URL+'images/write_mode_close.png" /></a>'+
+				'<img src="'+response.result.thumb+'" />'+
+				'<p>'+response.result.name+'</p>'+
+			'</div>'+
+			'<div class="safecracker_file_remove" style="display:none;">'+
+				'<input type="checkbox" name="'+cell.field.id+'['+cell.row.id+']['+cell.col.id+'_remove]" value="1" />'+
+			'</div>'+
+			'<div class="clear"></div>');
+
+			cell.dom.$td.find('.safecracker_file_input').hide().prepend('<a href="#" class="safecracker_file_undo_button">&larr; Undo Remove</a>');
+
+			cell.dom.$td.find('.safecracker_file_existing').hide();
+
+			cell.dom.$td.find('.safecracker_file_hidden').append('<input type="hidden" name="'+cell.field.id+'['+cell.row.id+']['+cell.col.id+'_hidden]" value="'+response.result.name+'" />');
+		}
 	},
 
 	/**
@@ -188,15 +210,21 @@ MMU.FileHandler = {
 
 		// if the File col is already tied to a specific upload directory,
 		// preselect that option here, and disable the Upload Directory select
-		if (typeof MMU.selectedCol.col.settings.directory != 'undefined') {
-			if (MMU.selectedCol.col.settings.directory == 'all') {
-				this.$filedirSection.show();
-				this.$uploadHeading.html('3. '+this.uploadHeadingText);
-			} else {
-				this.$filedirSelect.val(MMU.selectedCol.col.settings.directory);
-				this.$filedirSection.hide();
-				this.$uploadHeading.html('2. '+this.uploadHeadingText);
+		if (MMU.selectedCol.col.type == 'file') {
+			if (typeof MMU.selectedCol.col.settings.directory != 'undefined') {
+				if (MMU.selectedCol.col.settings.directory == 'all') {
+					this.$filedirSection.show();
+					this.$uploadHeading.html('3. '+this.uploadHeadingText);
+				} else {
+					this.$filedirSelect.val(MMU.selectedCol.col.settings.directory);
+					this.$filedirSection.hide();
+					this.$uploadHeading.html('2. '+this.uploadHeadingText);
+				}
 			}
+		}	else if (MMU.selectedCol.col.type == 'safecracker_file') {
+			this.$filedirSelect.val(MMU.selectedCol.col.settings.safecracker_upload_dir);
+			this.$filedirSection.hide();
+			this.$uploadHeading.html('2. '+this.uploadHeadingText);
 		}
 
 		if (typeof this.plupload == 'undefined') {
