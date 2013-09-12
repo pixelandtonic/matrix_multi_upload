@@ -5,12 +5,12 @@
  * Matrix Multi-Upload Update Class
  *
  * @package   Matrix Multi-Upload
- * @author    Brandon Kelly <brandon@pixelandtonic.com>
- * @copyright Copyright (c) 2010 Pixel & Tonic, LLC
+ * @author    Pixel & Tonic, Inc <support@pixelandtonic.com>
+ * @copyright Copyright (c) 2013 Pixel & Tonic, LLC
  */
 class Matrix_multi_upload_upd {
 
-	var $version = '0.9.1';
+	var $version = '0.9.2';
 
 	/**
 	 * Constructor
@@ -37,11 +37,28 @@ class Matrix_multi_upload_upd {
 		// add the upload action
 		$this->EE->db->insert('actions', array(
 			'class'  => 'Matrix_multi_upload_mcp',
-			'method' => 'upload'
+			'method' => 'upload',
+			'csrf_exempt' => 1
 		));
 
 		return TRUE;
 	}
+
+	/**
+	 * Update.
+	 * 
+	 * @param $from
+	 * @return bool
+	 */
+	function update($from)
+	{
+		if (version_compare($from, '0.9.2', '<'))
+		{
+			$this->EE->db->query("UPDATE exp_actions SET csrf_exempt = 1 WHERE `class` = 'Matrix_multi_upload_mcp'");
+		}
+		return TRUE;
+	}
+
 
 	/**
 	 * Uninstall
