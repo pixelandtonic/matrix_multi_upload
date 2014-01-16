@@ -10,7 +10,7 @@
  */
 class Matrix_multi_upload_upd {
 
-	var $version = '0.9.2';
+	var $version = '0.9.3';
 
 	/**
 	 * Constructor
@@ -35,24 +35,34 @@ class Matrix_multi_upload_upd {
 		));
 
 		// add the upload action
-		$this->EE->db->insert('actions', array(
-			'class'  => 'Matrix_multi_upload_mcp',
-			'method' => 'upload',
-			'csrf_exempt' => 1
-		));
+		if ($this->EE->db->field_exists('csrf_exempt', 'actions'))
+		{
+			$this->EE->db->insert('actions', array(
+				'class'  => 'Matrix_multi_upload_mcp',
+				'method' => 'upload',
+				'csrf_exempt' => 1
+			));
+		}
+		else
+		{
+			$this->EE->db->insert('actions', array(
+				'class'  => 'Matrix_multi_upload_mcp',
+				'method' => 'upload'
+			));
+		}
 
 		return TRUE;
 	}
 
 	/**
 	 * Update.
-	 * 
+	 *
 	 * @param $from
 	 * @return bool
 	 */
 	function update($from)
 	{
-		if (version_compare($from, '0.9.2', '<'))
+		if ($this->EE->db->field_exists('csrf_exempt', 'actions'))
 		{
 			$this->EE->db->query("UPDATE exp_actions SET csrf_exempt = 1 WHERE `class` = 'Matrix_multi_upload_mcp'");
 		}
