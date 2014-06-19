@@ -6,11 +6,11 @@
  *
  * @package   Matrix Multi-Upload
  * @author    Pixel & Tonic, Inc <support@pixelandtonic.com>
- * @copyright Copyright (c) 2013 Pixel & Tonic, LLC
+ * @copyright Copyright (c) 2014 Pixel & Tonic, LLC
  */
 class Matrix_multi_upload_upd {
 
-	var $version = '0.9.3';
+	var $version = '1.1.2';
 
 	/**
 	 * Constructor

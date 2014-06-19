@@ -5,8 +5,8 @@
  * Matrix Multi-Upload Helper
  *
  * @package Matrix Multi-Upload
- * @author Brandon Kelly <brandon@pixelandtonic.com>
- * @copyright Copyright (c) 2012 Pixel & Tonic, Inc
+ * @author    Pixel & Tonic, Inc <support@pixelandtonic.com>
+ * @copyright Copyright (c) 2014 Pixel & Tonic, LLC
  */
 class Matrix_multi_upload_helper {
 

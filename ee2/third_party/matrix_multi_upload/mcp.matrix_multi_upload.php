@@ -8,8 +8,8 @@ require_once PATH_THIRD.'matrix_multi_upload/helper.php';
  * Matrix Multi-Upload Module CP Class
  *
  * @package   Matrix Multi-Upload
- * @author    Brandon Kelly <brandon@pixelandtonic.com>, Andris Sevcenko <andris@pixelandtonic.com>
- * @copyright Copyright (c) 2010 Pixel & Tonic, LLC
+ * @author    Pixel & Tonic, Inc <support@pixelandtonic.com>
+ * @copyright Copyright (c) 2014 Pixel & Tonic, LLC
  */
 class Matrix_multi_upload_mcp {
 

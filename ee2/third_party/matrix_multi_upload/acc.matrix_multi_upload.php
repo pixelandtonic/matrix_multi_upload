@@ -9,14 +9,14 @@ require_once PATH_THIRD.'matrix_multi_upload/helper.php';
  *
  * @package   Matrix Multi-Upload
  * @author    Brandon Kelly <brandon@pixelandtonic.com>
- * @copyright Copyright (c) 2010 Pixel & Tonic, LLC
+ * @copyright Copyright (c) 2014 Pixel & Tonic, LLC
  */
 
 class Matrix_multi_upload_acc {
 
 	var $name        = 'Matrix Multi-Upload';
 	var $id          = 'matrix_multi_upload';
-	var $version     = '1.1.1';
+	var $version     = '1.1.2';
 	var $description = 'Upload multiple files to Matrix at once';
 	var $sections    = array();
 
