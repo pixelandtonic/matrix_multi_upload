@@ -79,7 +79,7 @@ MMU = {
 		if (this.selectedCol.col.type == 'file') {
 			this.FileHandler.show();
 			if (this.assetsInstalled) this.AssetsHandler.hide();
-            if (this.selectedCol.col.settings.directory != 'all') {
+			if (typeof this.selectedCol.col.settings.directory != "undefined" && this.selectedCol.col.settings.directory != 'all') {
                 MMU.FileHandler.setPluploadUrl(this.selectedCol.col.settings.directory);
             } else {
                 MMU.FileHandler.updatePluploadUrl();
