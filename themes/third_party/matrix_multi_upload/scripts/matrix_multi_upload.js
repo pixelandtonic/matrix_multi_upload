@@ -116,7 +116,8 @@ MMU.FileHandler = {
 		// initialize Plupload
 		this.$plupload.pluploadQueue({
 			runtimes: 'html5,flash',
-			url: this.getUploadUrl()
+			url: this.getUploadUrl(),
+			multiple_queues: true
 		});
 
 		// get the Plupload object
