@@ -10,7 +10,7 @@
  */
 class Matrix_multi_upload_upd {
 
-	var $version = '1.1.2';
+	var $version = '1.1.3';
 
 	/**
 	 * Constructor
