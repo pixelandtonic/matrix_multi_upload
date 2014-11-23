@@ -113,7 +113,7 @@ class Matrix_multi_upload_mcp {
 		$file_name = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
 
 		// Clean the fileName for security reasons
-		$file_name = preg_replace('/[^\w\._]+/', '', $file_name);
+		$file_name = preg_replace('/[^\w\._-]+/', '', $file_name);
 
 		// Make sure the fileName is unique
 		if (file_exists($path.$file_name))
